@@ -6,15 +6,27 @@ from slowapi.errors import RateLimitExceeded
 from app.models.schemas import TopicCluster
 from app.services.clustering import generate_clusters, generate_search_cluster
 from app.api.dependencies import verify_api_key
-
+from app.workers.ingestion import run_scheduler # Import your worker loop
 # --- Rate Limiter Setup ---
 # Limits requests based on the user's IP address
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Starts your background worker when the API boots up
+    print("Starting background ingestion worker...")
+    worker_task = asyncio.create_task(run_scheduler())
+    yield
+    # Shuts down the worker when the API stops
+    worker_task.cancel()
+
+# --- App Initialization ---
 limiter = Limiter(key_func=get_remote_address)
 
 app = FastAPI(
     title="Real-Time AI News Intelligence API",
     description="Scalable event intelligence platform featuring rate-limiting, auth, and semantic clustering.",
-    version="1.1.0"
+    version="1.1.0",
+    lifespan:lifespan
+
 )
 
 # Register the rate limiter middleware to the app
