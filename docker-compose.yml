@@ -1,0 +1,46 @@
+version: '3.8'
+
+# Define shared environment variables to prevent repetition
+x-shared-env: &shared-env
+  OPENAI_API_KEY: ${OPENAI_API_KEY}
+  LLM_MODEL: "gpt-4o-mini"
+
+services:
+  # 1. The FastAPI Gateway
+  api:
+    build: .
+    container_name: nexus_api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data  # Maps the local DB folder to the container
+    environment:
+      <<: *shared-env
+    restart: unless-stopped
+
+  # 2. The Async Ingestion Worker
+  worker:
+    build: .
+    container_name: nexus_worker
+    command: python -m app.workers.ingestion
+    volumes:
+      - ./data:/app/data  # Shares the EXACT same DB with the API
+    environment:
+      <<: *shared-env
+    restart: unless-stopped
+    depends_on:
+      - api  # Ensures the API is up before the worker starts
+
+  # 3. The Streamlit Frontend
+  frontend:
+    build: .
+    container_name: nexus_ui
+    command: streamlit run frontend/ui.py --server.port 8501 --server.address 0.0.0.0
+    ports:
+      - "8501:8501"
+    environment:
+      <<: *shared-env
+    restart: unless-stopped
+    depends_on:
+      - api
