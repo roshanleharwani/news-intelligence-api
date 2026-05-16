@@ -69,13 +69,14 @@ async def run_ingestion_cycle():
             
     print("-" * 40)
     print(f"Pipeline Complete: {saved_count} new events stored. {duplicate_count} duplicates dropped.")
-if __name__ == "__main__":
-    # Wrap the ingestion cycle in a continuous interval loop
-    async def run_scheduler():
-        while True:
-            await run_ingestion_cycle()
-            print("Sleeping for 60 minutes before next ingestion...")
-            await asyncio.sleep(3600) # Runs every hour
+# --- Move the function OUTSIDE so it can be imported ---
+async def run_scheduler():
+    while True:
+        await run_ingestion_cycle()
+        print("Sleeping for 3 minutes before next ingestion...")
+        await asyncio.sleep(180)
 
+# --- Keep the execution block at the bottom ---
+if __name__ == "__main__":
     asyncio.run(run_scheduler())
 
