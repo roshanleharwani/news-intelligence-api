@@ -74,7 +74,7 @@ async def run_scheduler():
     while True:
         await run_ingestion_cycle()
         print("Sleeping for 3 minutes before next ingestion...")
-        await asyncio.sleep(180)
+        await asyncio.sleep(86400)
 
 # --- Keep the execution block at the bottom ---
 if __name__ == "__main__":
