@@ -48,41 +48,41 @@ The system continuously ingests news from 5 curated RSS feeds every 3 minutes, u
 ┌────────────────────────────────────────────────────────────────────┐
 │                         NEXUS ENGINE                               │
 │                                                                    │
-│  ┌─────────────────────────────────────────────────────────────┐  │
-│  │                  INGESTION PIPELINE (Worker)                 │  │
-│  │                                                              │  │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                  INGESTION PIPELINE (Worker)                │  │
+│  │                                                             │  │
 │  │  [RSS Feeds] ──► [fetch_feed] ──► [process_batch / OpenAI]  │  │
-│  │                                          │                   │  │
+│  │                                          │                  │  │
 │  │                              ┌───────────▼────────────┐     │  │
-│  │                              │  Semantic Deduplication │     │  │
-│  │                              │  (ChromaDB cosine dist) │     │  │
+│  │                              │  Semantic Deduplication │    │  │
+│  │                              │  (ChromaDB cosine dist) │    │  │
 │  │                              └───────────┬────────────┘     │  │
-│  │                                          │                   │  │
+│  │                                          │                  │  │
 │  │                              ┌───────────▼────────────┐     │  │
-│  │                              │   ChromaDB Vector Store │     │  │
-│  │                              │   (./data/vector_db)    │     │  │
+│  │                              │   ChromaDB Vector Store │    │  │
+│  │                              │   (./data/vector_db)    │    │  │
 │  │                              └───────────┬────────────┘     │  │
 │  └──────────────────────────────────────────│──────────────────┘  │
-│                                             │                      │
+│                                             │                     │
 │  ┌──────────────────────────────────────────▼──────────────────┐  │
-│  │                   FastAPI REST Gateway                       │  │
-│  │                                                              │  │
+│  │                   FastAPI REST Gateway                      │  │
+│  │                                                             │  │
 │  │   GET /digest   ──► [HDBSCAN Clustering] ──► TopicClusters  │  │
 │  │   GET /topic/{name} ──► [Semantic Search] ──► TopicCluster  │  │
-│  │   POST /subscribe, /unsubscribe                              │  │
+│  │   POST /subscribe, /unsubscribe                             |  │
 │  │   GET  /subscriptions, /my-feed                             │  │
-│  │                                                              │  │
+│  │                                                             │  │
 │  │   ● Rate Limiting (SlowAPI)   ● API Key Auth (X-API-Key)    │  │
-│  └──────────────────────────────────────────────────────────────┘  │
-│                                             │                      │
+│  └─────────────────────────────────────────────────────────────┘  │
+│                                             │                     │
 │  ┌──────────────────────────────────────────▼──────────────────┐  │
-│  │               Streamlit Dashboard (Nexus UI)                 │  │
-│  │                                                              │  │
+│  │               Streamlit Dashboard (Nexus UI)                │  │
+│  │                                                             │  │
 │  │   ● Live Event Feed         ● Semantic Search Bar           │  │
 │  │   ● Topic Quick Filters     ● Sentiment Filter Pills        │  │
 │  │   ● Subscribe / Unsubscribe ● Metric Cards                  │  │
-│  └──────────────────────────────────────────────────────────────┘  │
-└────────────────────────────────────────────────────────────────────┘
+│  └─────────────────────────────────────────────────────────────┘  │
+└───────────────────────────────────────────────────────────────────┘
 ```
 
 ### Data Flow
