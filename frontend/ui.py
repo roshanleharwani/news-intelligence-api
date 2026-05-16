@@ -3,7 +3,7 @@ import requests
 from datetime import datetime
 
 # --- Configuration & Custom CSS ---
-API_URL = "http://api:8000"
+API_URL = "http://127.0.0.1:8000"
 st.set_page_config(
     page_title="Nexus | Event Intelligence",
     page_icon="⚡",
