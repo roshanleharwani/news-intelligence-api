@@ -25,7 +25,7 @@ app = FastAPI(
     title="Real-Time AI News Intelligence API",
     description="Scalable event intelligence platform featuring rate-limiting, auth, and semantic clustering.",
     version="1.1.0",
-    lifespan:lifespan
+    lifespan=lifespan
 
 )
 
