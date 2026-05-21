@@ -45,12 +45,12 @@ USER_SUBSCRIPTIONS: Dict[str, List[str]] = {
 # --- Core API Endpoints ---
 
 @app.get("/", tags=["Health"])
-@limiter.limit("10/minute") # Example: Max 10 hits per minute
+@limiter.limit("1000/minute") # Example: Max 10 hits per minute
 async def root(request: Request):
     return {"status": "online", "system": "Nexus Engine Active"}
 
 @app.get("/digest", response_model=List[TopicCluster], tags=["News"])
-@limiter.limit("5/minute") # Strict rate limit for heavy DB/AI endpoints
+@limiter.limit("500/minute") # Strict rate limit for heavy DB/AI endpoints
 async def get_digest(request: Request, api_key: str = Depends(verify_api_key)):
     """Retrieve all clustered news. Requires a valid API Key."""
     clusters = await generate_clusters()
@@ -59,7 +59,7 @@ async def get_digest(request: Request, api_key: str = Depends(verify_api_key)):
     return clusters
 
 @app.get("/topic/{name}", response_model=TopicCluster, tags=["News"])
-@limiter.limit("15/minute")
+@limiter.limit("1500/minute")
 async def get_topic(request: Request, name: str, api_key: str = Depends(verify_api_key)):
     """
     Advanced Semantic Search endpoint. 
@@ -75,7 +75,7 @@ async def get_topic(request: Request, name: str, api_key: str = Depends(verify_a
 # --- Bonus: Topic Subscriptions ---
 
 @app.post("/subscribe", tags=["Subscriptions"])
-@limiter.limit("5/minute")
+@limiter.limit("500/minute")
 async def subscribe_to_topic(request: Request, topic: str, api_key: str = Depends(verify_api_key)):
     """Allows a user to subscribe to a specific news topic."""
     if api_key not in USER_SUBSCRIPTIONS:
@@ -91,7 +91,7 @@ async def subscribe_to_topic(request: Request, topic: str, api_key: str = Depend
     }
 
 @app.post("/unsubscribe", tags=["Subscriptions"])
-@limiter.limit("5/minute")
+@limiter.limit("500/minute")
 async def unsubscribe_from_topic(request: Request, topic: str, api_key: str = Depends(verify_api_key)):
     """Allows a user to unsubscribe from a specific news topic."""
     if api_key in USER_SUBSCRIPTIONS and topic in USER_SUBSCRIPTIONS[api_key]:
@@ -104,13 +104,13 @@ async def unsubscribe_from_topic(request: Request, topic: str, api_key: str = De
     }
 
 @app.get("/subscriptions", tags=["Subscriptions"])
-@limiter.limit("10/minute")
+@limiter.limit("1000/minute")
 async def get_subscriptions(request: Request, api_key: str = Depends(verify_api_key)):
     """Returns the user's active topic subscriptions."""
     return {"subscriptions": USER_SUBSCRIPTIONS.get(api_key, [])}
 
 @app.get("/my-feed", response_model=List[TopicCluster], tags=["Subscriptions"])
-@limiter.limit("5/minute")
+@limiter.limit("500/minute")
 async def get_personalized_feed(request: Request, api_key: str = Depends(verify_api_key)):
     """Returns only the clusters that match the user's subscribed topics."""
     user_topics = USER_SUBSCRIPTIONS.get(api_key, [])
